@@ -1,6 +1,6 @@
 # nerdle
 
-A new worldle-inspired Flutter project.
+A wordle-inspired Flutter project.
 
 ## in development
 
