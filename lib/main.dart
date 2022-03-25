@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'dart:convert';
-import 'dart:async';
 
 import './game_board.dart';
 
@@ -48,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
         numGuesses: NUMGUESSES,
         wordSize: WORDSIZE,
       ),
+      // resizeToAvoidBottomInset: false,
     );
   }
 }

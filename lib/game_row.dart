@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'game_cell.dart';
 import 'models/logical_board.dart';
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class GameRow extends StatefulWidget {
   final int wordSize;
   final bool isActive;
-  WordModel word;
+  final WordModel word;
+  Function(String)? handleGuess;
 
   GameRow.empty(
       {Key? key,
@@ -14,10 +27,8 @@ class GameRow extends StatefulWidget {
       this.isActive = false})
       : super(key: key);
 
-  GameRow.current({
-    Key? key,
-    required this.wordSize,
-  })  : word = [],
+  GameRow.current({Key? key, required this.wordSize, required this.handleGuess})
+      : word = [],
         isActive = true,
         super(key: key);
 
@@ -33,6 +44,31 @@ class GameRow extends StatefulWidget {
 class _GameRowState extends State<GameRow> {
   int activeCell = 0;
   String guess = "";
+  TextEditingController? controller;
+  FocusNode? focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isActive) {
+      controller = TextEditingController();
+      focusNode = FocusNode();
+      // FocusScope.of(context).requestFocus(focusNode);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (widget.isActive) {
+      controller?.dispose();
+      focusNode?.dispose();
+    }
+  }
+
+  void _handleSubmit(String str) {
+    print("Final submission: ${str}");
+  }
 
   List<Cell> _rowBuilder() {
     List<Cell> row = [];
@@ -43,55 +79,47 @@ class _GameRowState extends State<GameRow> {
         row.add(Cell(cell: widget.word[i]));
       }
       return row;
-    }
-
-    // Otherwise build row letter by letter:
-    // First, fill cells with letters guessed so far:
-    if (guess.isNotEmpty) {
-      for (int i = 0; i < guess.length; i++) {
-        print('Adding cell ${i} which is ${guess[i]}...');
+    } else {
+      for (int i = 0; i < widget.wordSize; i++) {
         row.add(Cell(
-            cell: LogicalCell(letter: guess[i], status: CellStatus.noStatus)));
-      }
-    }
-
-    // if guess doesn't fill up row, add active cell:
-    if (row.length < widget.wordSize) {
-      row.add(Cell(
-        cell: LogicalCell(letter: " ", status: CellStatus.noStatus),
-        isActive: true,
-      ));
-    }
-
-    // fill out remainder of row with empty cells:
-    if (row.length < widget.wordSize) {
-      for (int i = 0; i < this.widget.wordSize - guess.length - 1; i++) {
-        row.add(
-            Cell(cell: LogicalCell(letter: " ", status: CellStatus.noStatus)));
+          cell: LogicalCell(letter: " ", status: CellStatus.noStatus),
+          isActive: false,
+        ));
       }
     }
 
     return row;
   }
 
+  Widget _inputRow() {
+    return Container(
+        height: 50,
+        width: 240,
+        child: TextField(
+          autofocus: true,
+          controller: controller,
+          focusNode: focusNode,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+              fontSize: 36, fontWeight: FontWeight.w700, color: Colors.black87),
+          // keyboardType: TextInputType.name,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(5),
+            UpperCaseTextFormatter(),
+            FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+          ],
+          onSubmitted: widget.handleGuess,
+        ));
+    // onChanged: widget.onChanged,
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget row = Container(
+    return Container(
         alignment: Alignment.center,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: _rowBuilder(),
+          children: widget.isActive ? [_inputRow()] : _rowBuilder(),
         ));
-
-    if (widget.isActive) {
-      row = KeyboardListener(
-          focusNode: FocusNode(),
-          onKeyEvent: (KeyEvent k) {
-            print("Key pressed...");
-          },
-          child: row);
-    }
-
-    return row;
   }
 }

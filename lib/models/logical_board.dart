@@ -31,8 +31,9 @@ class InvalidGuessException implements Exception {
 }
 
 class LogicalBoard {
-  List<WordModel> rows = [[]];
+  List<WordModel> rows = [];
   String targetWord;
+  bool guessed = false;
 
   LogicalBoard(this.targetWord);
 
@@ -46,11 +47,18 @@ class LogicalBoard {
       throw InvalidGuessException();
     }
 
+    int numCorrect = 0;
     for (int i = 0; i < guess.length; i++) {
       String letter = guess[i];
 
       if (guess[i] == targetWord[i]) {
         row.add(LogicalCell(letter: letter, status: CellStatus.correct));
+        numCorrect++;
+        print("${letter} is correct! That is ${numCorrect} letters!");
+        if (numCorrect == targetWord.length) {
+          guessed = true;
+          print("YOU GOT IT RIGHT! NICE WORK!");
+        }
       } else if (targetWord.contains(letter)) {
         row.add(LogicalCell(letter: letter, status: CellStatus.inWrongPlace));
       } else {
