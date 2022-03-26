@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/puzzle.dart';
 import '../models/word.dart';
+import '../models/letter.dart';
 import './game_row.dart';
 
 class GameBoard extends StatelessWidget {
@@ -14,40 +16,35 @@ class GameBoard extends StatelessWidget {
     List<GameRow> uiBoard = [];
 
     // fill up rows for any prior guesses:
-    if (puzzle.rows.length > 0) {
+    if (puzzle.guessesTaken > 0) {
       for (Word guess in puzzle.rows) {
-        String guessWord = "";
-        for (int i = 0; i < guess.length; i++) {
-          guessWord += guess[i].letter;
-        }
-
         uiBoard.add(GameRow.guessed(word: guess));
       }
     }
 
     // add current Row
-    if (remainingGuesses > 0) {
+    if (puzzle.guessesRemaining > 0) {
       uiBoard.add(GameRow.current(
-        wordSize: wordSize,
+        wordSize: puzzle.wordSize,
         handleGuess: handleGuess,
       ));
     }
 
     // add empty rows for rest of board
-    for (int i = 0; i < numGuesses - puzzle.rows.length - 1; i++) {
+    for (int i = 0; i < puzzle.guessesRemaining - 1; i++) {
       uiBoard.add(GameRow.empty(
-        wordSize: wordSize,
+        wordSize: puzzle.wordSize,
       ));
     }
 
     // for debugging purposes, add extra row with target word at bottom:
     if (kDebugMode) {
-      WordModel targetWordModel = [];
-      for (int i = 0; i < puzzle.targetWord.length; i++) {
-        targetWordModel.add(Letter(
+      Word targetAsWord = [];
+      for (int i = 0; i < puzzle.wordSize; i++) {
+        targetAsWord.add(Letter(
             letter: puzzle.targetWord[i], status: LetterStatus.noStatus));
-        uiBoard.add(GameRow.guessed(word: targetWordModel));
       }
+      uiBoard.add(GameRow.guessed(word: targetAsWord));
     }
 
     return uiBoard;
@@ -55,6 +52,9 @@ class GameBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+        child: ListView(
+      children: _boardBuilder(puzzle, handleGuess),
+    ));
   }
 }

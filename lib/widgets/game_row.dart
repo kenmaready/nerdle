@@ -102,7 +102,7 @@ class _GameRowState extends State<GameRow> {
           textAlign: TextAlign.center,
           style: const TextStyle(
               fontSize: 36, fontWeight: FontWeight.w700, color: Colors.black87),
-          // keyboardType: TextInputType.name,
+          // keyboardType: TextInputType.text,
           inputFormatters: [
             LengthLimitingTextInputFormatter(5),
             UpperCaseTextFormatter(),
