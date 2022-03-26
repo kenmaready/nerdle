@@ -2,6 +2,8 @@
 
 A wordle-inspired app for mobile phones developed with Flutter.
 
+![Screenshot of nerdle game in play](nerdle.png)
+
 ## in development
 
 Basic gameplay is working with my limited list of five-letter words in a .txt file.  Need to work on following improvements:
