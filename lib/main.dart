@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
-import './game_board.dart';
-
-const int WORDSIZE = 5;
-const int NUMGUESSES = 5;
+import 'game.dart';
+import 'config.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,11 +38,10 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: GameBoard(
-        numGuesses: NUMGUESSES,
-        wordSize: WORDSIZE,
-      ),
-      // resizeToAvoidBottomInset: false,
+      body: const Game(
+          numGuesses: config.numGuesses,
+          wordSize: config.wordSize,
+          wordSource: config.wordSource),
     );
   }
 }

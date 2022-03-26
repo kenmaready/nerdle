@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'game_cell.dart';
-import 'models/logical_board.dart';
+import '../models/puzzle.dart';
+import '../models/word.dart';
+import '../models/letter.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -17,7 +19,7 @@ class UpperCaseTextFormatter extends TextInputFormatter {
 class GameRow extends StatefulWidget {
   final int wordSize;
   final bool isActive;
-  final WordModel word;
+  final Word word;
   Function(String)? handleGuess;
 
   GameRow.empty(
@@ -76,18 +78,16 @@ class _GameRowState extends State<GameRow> {
     // if row has already been guessed, produce row with word in it:
     if (widget.word.isNotEmpty) {
       for (int i = 0; i < widget.word.length; i++) {
-        row.add(Cell(cell: widget.word[i]));
+        row.add(Cell(letter: widget.word[i]));
       }
       return row;
     } else {
       for (int i = 0; i < widget.wordSize; i++) {
         row.add(Cell(
-          cell: LogicalCell(letter: " ", status: CellStatus.noStatus),
-          isActive: false,
+          letter: Letter(letter: " ", status: LetterStatus.noStatus),
         ));
       }
     }
-
     return row;
   }
 
