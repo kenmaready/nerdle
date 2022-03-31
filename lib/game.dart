@@ -73,6 +73,8 @@ class _GameState extends State<Game> {
       String targetWord = _words[_random.nextInt(_words.length)];
       print("targetWord is: ${targetWord}"); // TESTING
       puzzle = Puzzle(targetWord: targetWord);
+      puzzle.guess("BRASS");
+      puzzle.guess("FLASH");
       boardReady = true;
     });
   }

@@ -48,15 +48,16 @@ class _GameRowState extends State<GameRow> {
   String guess = "";
   TextEditingController? controller;
   FocusNode? focusNode;
+  List<Cell> inputRow = [];
 
   @override
   void initState() {
     super.initState();
-    if (widget.isActive) {
-      controller = TextEditingController();
-      focusNode = FocusNode();
-      // FocusScope.of(context).requestFocus(focusNode);
-    }
+    // if (widget.isActive) {
+    //   controller = TextEditingController();
+    //   focusNode = FocusNode();
+    //   FocusScope.of(context).requestFocus(focusNode);
+    // }
   }
 
   @override
@@ -66,10 +67,6 @@ class _GameRowState extends State<GameRow> {
       controller?.dispose();
       focusNode?.dispose();
     }
-  }
-
-  void _handleSubmit(String str) {
-    print("Final submission: ${str}");
   }
 
   List<Cell> _rowBuilder() {
@@ -91,35 +88,90 @@ class _GameRowState extends State<GameRow> {
     return row;
   }
 
-  Widget _inputRow() {
-    return Container(
-        height: 50,
-        width: 240,
-        child: TextField(
-          autofocus: true,
-          controller: controller,
-          focusNode: focusNode,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-              fontSize: 36, fontWeight: FontWeight.w700, color: Colors.black87),
-          // keyboardType: TextInputType.text,
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(5),
-            UpperCaseTextFormatter(),
-            FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
-          ],
-          onSubmitted: widget.handleGuess,
-        ));
+  void _updateInputRow() {
+    List<Cell> row = [];
+
+    guess = controller?.text ?? "";
+
+    for (int i = 0; i < guess.length; i++) {
+      row.add(Cell(
+          letter: Letter(letter: guess[i], status: LetterStatus.noStatus)));
+    }
+
+    for (int i = 0; i < widget.wordSize - guess.length; i++) {
+      row.add(Cell(letter: Letter(letter: " ", status: LetterStatus.noStatus)));
+    }
+
+    inputRow = row;
+  }
+
+  void _handleGuess() {
+    (widget.handleGuess as Function(String))(guess);
+  }
+
+  List<Widget> _inputRow() {
+    // return Column(
+    //   children: [
+    //     Row(children: inputRow),
+    //     Container(
+    //         height: 30,
+    //         width: 240,
+    //         child: TextField(
+    //             autofocus: true,
+    //             focusNode: focusNode,
+    //             controller: controller,
+    //             textCapitalization: TextCapitalization.characters,
+    //             style: const TextStyle(
+    //                 fontSize: 24,
+    //                 fontWeight: FontWeight.w100,
+    //                 color: Colors.black54),
+    //             textAlign: TextAlign.center,
+    //             onChanged: (String text) {
+    //               print(text);
+    //               // _updateInputRow();
+    //             },
+    //             inputFormatters: [
+    //               LengthLimitingTextInputFormatter(5),
+    //               UpperCaseTextFormatter(),
+    //               FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+    //             ],
+    //             onEditingComplete: () {}))
+    //   ],
+    // );
     // onChanged: widget.onChanged,
+
+    return [
+      Expanded(
+          // height: 24,
+          child: TextField(
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+        inputFormatters: [
+          UpperCaseTextFormatter(),
+          LengthLimitingTextInputFormatter(5),
+          FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+        ],
+        onSubmitted: (str) =>
+            (widget.handleGuess as Function(String))(str.toUpperCase()),
+      ))
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.isActive) {
+      controller = TextEditingController();
+      focusNode = FocusNode();
+      FocusScope.of(context).requestFocus(focusNode);
+    }
+
+    print(
+        "Drawing current row and I'm ${widget.isActive ? "" : "not "} active...");
     return Container(
         alignment: Alignment.center,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: widget.isActive ? [_inputRow()] : _rowBuilder(),
+          children: widget.isActive ? _inputRow() : _rowBuilder(),
         ));
   }
 }

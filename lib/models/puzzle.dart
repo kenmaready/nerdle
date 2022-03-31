@@ -1,4 +1,6 @@
-// import 'letter.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+//
 import 'word.dart';
 import 'letter.dart';
 
@@ -7,7 +9,7 @@ class InvalidGuessException implements Exception {
       'Length of provided guess was invalid. Must be same length as target word.';
 }
 
-class Puzzle {
+class Puzzle with ChangeNotifier {
   String targetWord;
   int? maxGuesses; // maxGuesses is optional parameter. If not provided,
   // the puzzle will allow as many guesses as there are
@@ -69,5 +71,7 @@ class Puzzle {
 
     // if there are no guesses remaining then toggle failure flag
     if (guessesRemaining <= 0 && !success) fail = true;
+
+    notifyListeners();
   }
 }
