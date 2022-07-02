@@ -47,7 +47,7 @@ class _GameBoardState extends State<GameBoard> {
     }
 
     // for debugging purposes, add extra row with target word at bottom:
-    if (kDebugMode) {
+    if (kDebugMode && false) {
       Word targetAsWord = [];
       for (int i = 0; i < puzzle.wordSize; i++) {
         targetAsWord.add(Letter(
